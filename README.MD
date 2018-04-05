@@ -24,11 +24,11 @@ biocLite("Cardinal")
 install.packages('devtools')
 
 ##install the aimsMSRC package
-install_github('outrepo')
+install_github('nhpatterson/aimsMSRC')
 ```
 
 ## What's next?
 
-* Examine the tutorial [scripts](https://github.com/) and [R markdown](https://github.com) files for workflow examples
+* Examine the tutorial [scripts](https://github.com/nhpatterson/scripts) and [R markdown](https://github.com/nhpatterson/markdown) files for workflow examples
 
 
