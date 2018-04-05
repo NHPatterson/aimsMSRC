@@ -27,7 +27,7 @@ install.packages('devtools')
 install_github('outrepo')
 ```
 
-##What's next?
+## What's next?
 
 * Examine the tutorial [scripts](https://github.com/) and [R markdown](https://github.com) files for workflow examples
 
