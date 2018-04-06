@@ -29,6 +29,6 @@ install_github('nhpatterson/aimsMSRC')
 
 ## What's next?
 
-* Examine the tutorial [scripts](https://github.com/nhpatterson/scripts) and [R markdown](https://github.com/nhpatterson/markdown) files for workflow examples
+* Examine the tutorial [scripts](https://github.com/nhpatterson/aimsMSRC/scripts) and [R markdown](https://github.com/nhpatterson/aimsMSRC/markdown) files for workflow examples
 
 
