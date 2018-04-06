@@ -1,0 +1,214 @@
+---
+title: "AIMS.MSRC - data preparation for fusion via Cardinal in R"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 1080)
+```
+
+# IMS data introduction
+
+The data must be in the .imzml format which virtually all MALDI IMS instrument vendors are now capable of outputting. 
+Secondarily, the fusion tool currently only accepts raw data where it will perform peak-picking, because of this only full profile data is supported at this time ('continuous' data in .imzml). This precludes many vendor exports of 'processed' .imzmls where each IMS pixel is stored as a peak list without a common m/z axis.
+
+### import required packages
+```{r import_packages, echo=T, message=F, warning=FALSE, results="hide"}
+require(Cardinal)
+require(aimsMSRC)
+require(jpeg)
+require(tiff)
+require(png)
+```
+
+### read imzML file into Cardinal
+```{r read_data}
+cer_dan <- readImzML('DAN_cerebellum_neg', folder = 'D:/code/testing_data/') # data file : D:/code/testing_data/DAN_cerebellum_neg.imzML
+
+summary(cer_dan)
+
+```
+
+```{r,echo=F}
+
+mz_range = range(Cardinal::mz(cer_dan))
+
+cat(paste0('approximate step size: ', 
+           round((max(mz_range) - min(mz_range)) / nrow(cer_dan),3), 
+           ' m/z'))
+
+```
+
+
+We now have a dataset with 8000 m/z bins and 19888 pixels with an approximate step size of 0.114 m/z. 
+
+# IMS Data pre-processing
+
+While no data pre-processing is strictly required, we can speed up ouput, decrease the data size on disk, and improve some fusion results with some simple formatting steps.
+
+* normalize data to TIC (if not already performed)
+* resample data to lower resolution
+* round off numerical intensity data to save disk space
+* minimize x,y coordinates
+
+### do normalization to TIC
+```{r pre_process_normalize, message=FALSE, warning=FALSE, results="hide"}
+##normalize to TIC
+cer_dan <- normalize(cer_dan, method = "tic")
+```
+### resample mass axis
+```{r pre_process_resample, message=FALSE, warning=FALSE, results="hide",eval=FALSE}
+##resample data to lower resolution (this can be slow)
+cer_dan <- reduceDimension(cer_dan, method="resample", step=0.2) #step here is defined in Daltons.
+```
+
+### round intensity data to 3 decimal places
+```{r pre_process_other,eval=FALSE}
+##round off numerical intensity data to save disk space (this can be slow)
+iData(cer_dan) <- round(iData(cer_dan), 3) #3 = no. of decimal places
+```
+
+### reduce x,y coordinates
+```{r reduce_xy}
+##minimize x,y coordinates using reduceXYcardinal function
+cer_dan <- reduceXYcardinal(cer_dan)
+
+```
+
+
+# IMS data output for fusion
+
+Here we will export the processed IMS data to a comma-seperated .txt file with the corresponding metadata in an .xml.
+Files will be saved in the working directory (use setwd('mydirectory/') to set working directory).
+
+### output IMS data in fusion format
+```{r output_IMS_data, echo=T, results="hide", eval=F}
+
+##saving the data is accomplished in one function
+##this functions writes a UNIX format UTF-8 text file and it can take a very long time depending on the size of the dataset
+
+outputIMSfusion(cer_dan, #the pre-processed data object 
+                filename = 'cer_dan_fusion_IMS', #output filename, will be appended with appropriate extensions for raw data and metadata
+                data_label = 'DAN negative cerebellum', #used for some names on plotting, a description of the data
+                type= 'continuous', #support will eventually be added for peak-picked data but for now only 'continuous' does anything 
+                IMS_spatial_res = 35) #spatial resolution of the IMS data in micron / pixel
+
+```
+
+
+# Microscopy data introduction
+
+Microscopy (or other) data for image fusion is loaded into R using a the tiff, png, or jpeg packages for image importing and should be RGB (although we may incorporate other options in the future).
+
+Once in R, the images will be x-y-color channel 3D arrays which will be output in long format for fusion.
+
+We additionally include an option to import a single channel binary mask. 
+
+For making masks you can use Fiji ImageJ and save the mask as a .png. 
+png is an efficient encoding for binary masks of even very large images typical of microscopy. 
+
+### import microscropy data for fusion output
+```{r import_micro_data}
+micro_image_array <- readJPEG('D:/code/testing_data/cer_2umpix.jpg')
+
+#looking at image structure in R
+str(micro_image_array)
+
+mask_image_array <- readPNG('D:/code/testing_data/cer_2umpix_mask.png')
+
+#looking at image structure in R
+str(mask_image_array)
+
+##make sure it is an actual mask where 1 indicates pixels to include in fusion and 0 pixels to exclude from data output
+table(mask_image_array)
+
+
+```
+
+# Microscopy data output for fusion
+
+We will now take the imported arrays and output the necessary data for fusion.
+
+### output microscopy data in fusion format
+```{r output_micro_data, eval=F}
+outputMicroFusion(micro_image_array, #the array of microscopy data loaded into R
+                  filename="cer_dan_fusion_micro", #output file name
+                  mask_image_array = NULL, #the array of microscopy mask data loaded into R, defaults to NULL
+                  data_label = 'microscopy data of cerebellum, serial section', #description of the data
+                  micro_spatial_res = 2) #spatial resolution of the microscopy data in micron / pixel
+```
+
+
+# IMS image for registration
+
+IMS data is first registered to the microscopy data for fusion, providing a spatial mapping between the modalities for subsequent data mining. 
+The next section provides a tool to export images that represent the coordinate space of the IMS data for registration. 
+The images to use for registration are up to the user. These can be m/zs or PCA plots, etc.
+
+### plot IMS representative IMS image
+```{r show_imsmz}
+######here will we output a registration image based on m/z and PCA scores
+
+##m/z
+#first let's plot an ion image
+image(cer_dan, 
+      mz=835.8, #m/z value for plotting
+      plusminus=0.4, #mass extents for plotting
+      main= "ion image plot",
+      layout=c(1,1)) 
+
+```
+
+### output representative m/z image for registration
+```{r output_mz, eval=FALSE}
+#now we will output this same image as a tif ready for control point registration
+outputIMSrepImg(cer_dan, #image data set
+                filename = 'cer_dan_IMS_mz_reg_image',
+                mz=835.8,
+                plusminus=0.4)
+```
+
+### perform PCA
+```{r run_pca}
+##PCA score plot
+#first let's run the PCA, then plot an 
+pca_out <- PCA(cer_dan, ncomp=20)
+```
+
+### plot PCA images
+```{r show_pca}
+#show images for PC 1 -3
+image(pca_out,
+      column=1, #changes the PC that is plotted
+      layout=c(3,1),
+      main="PC1",
+      colorkey=F,
+      key=F)
+
+image(pca_out,
+      column=2, #changes the PC that is plotted
+      main="PC2",
+      colorkey=F,
+      key=F)
+
+image(pca_out,
+      column=3, #changes the PC that is plotted
+      main="PC3",
+      colorkey=F,
+      key=F)
+```
+
+### output a PC image for IMS-microscopy registration
+```{r, eval= F}
+#now we can output the PCA image for registration, here we select PC2
+
+outputIMSrepImg(pca_out, #image data set
+                filename = 'cer_dan_IMS_pc2_reg_image',
+                column = 2) #as the function passes arguments to Cardinal's image(...) function, 
+                            #we can use pass in any imageable object type
+
+```
+
+*next step: registration and then running fusion!*

@@ -29,6 +29,10 @@ install_github('nhpatterson/aimsMSRC')
 
 ## What's next?
 
-* Examine the tutorial [scripts](https://github.com/NHPatterson/aimsMSRC/tree/master/scripts) and [R markdown](https://github.com/NHPatterson/aimsMSRC/tree/master/markdown) files for workflow examples
+* Examine the tutorials:
+ 
+    * [Data reading and pre-processing to peaks](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.Rmd)
+    * [Comparse two user selected ROIs using ROC analysis](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_ROI_comparison.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_ROI_comparison.Rmd)
+    * [Convert & export data for data-driven image fusion](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_fusion_example.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_fusion_example.Rmd)
 
 

@@ -1,0 +1,99 @@
+---
+title: "AIMS.MSRC - ROI comparison within a single sample"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+# Introduction
+
+Within this example we will show how to do region of interest comparison within a single sample and some algorithms that are useful for making such comparisons.
+
+### Import required packages
+```{r import_packages, echo=T, message=F, warning=FALSE, results="hide"}
+require(Cardinal)
+require(aimsMSRC)
+```
+
+### Import included mouse brain cerebellum dataset
+```{r}
+data(cer_dan_peaks)
+```
+
+### Plot ion image
+```{r}
+image(cer_dan_peaks, mz=885.58)
+```
+
+### Select an ROI based on a displayed ion image
+*n.b. this command must be run in RStudio in order to make selection and is not compatible with notebook*
+```{r selectROI, eval=F}
+##molecular layer
+cer_dan_peaks = selectROI(cer_dan_peaks, mz=766.55)
+```
+
+```{r show_molecular}
+image(cer_dan_peaks, cer_dan_peaks$molecular_layer ~ x*y, 
+      strip=F, 
+      colorkey=F, 
+      key=F,
+      main="Molecular layer selection in red")
+```
+```{r, eval=F}
+##granular layer
+cer_dan_peaks = selectROI(cer_dan_peaks, mz=795.58)
+```
+
+```{r show_granular}
+image(cer_dan_peaks, cer_dan_peaks$granular_layer ~ x*y, 
+      strip=F, 
+      colorkey=F, 
+      key=F,
+      main="Granular layer selection in red")
+```
+
+### Reciever Operator Characteristic (ROC) curve analysis to determine discriminant signals
+*molecular layer*
+```{r ROC_molecular}
+##determine the species most associated with the molecular layer
+mol_layer_ROC <- rocIMS(cer_dan_peaks, 
+       mzs= 'all', 
+       positiveROI = 'molecular_layer',
+       negativeROI = 'all',
+       undersampling=T)
+
+##print top 6 m/zs of molecular layer by ROC analysis:
+cat(head(names(mol_layer_ROC)))
+
+```
+
+```{r ROC_plot_molecular}
+plotROCmz(cer_dan_peaks, mol_layer_ROC, top_n = 3, layout=c(2,3))
+```
+
+*granular layer*
+```{r ROC_granular}
+##determine the species most associated with the molecular layer
+gran_layer_ROC <- rocIMS(cer_dan_peaks, 
+       mzs= 'all', 
+       positiveROI = 'granular_layer',
+       negativeROI = 'all',
+       undersampling=T)
+
+##print top 6 m/zs of molecular layer by ROC analysis:
+cat(head(names(gran_layer_ROC)))
+
+```
+
+```{r ROC_plot_granular}
+plotROCmz(cer_dan_peaks, gran_layer_ROC, top_n = 3, layout=c(2,3))
+```
+
+### Look at intensity distribution of these ROIs
+```{r int_boxplot}
+mzIntensPlot(cer_dan_peaks, mz=795.589, roi_names = c('molecular_layer','granular_layer'))
+
+mzIntensPlot(cer_dan_peaks, mz=834.518, roi_names = c('molecular_layer','granular_layer'))
+
+```
+

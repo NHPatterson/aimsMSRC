@@ -1,0 +1,93 @@
+---
+title: "AIMS.MSRC - IMS data pre-processing"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+# Introduction
+
+In this tutorial we will load an .imzML converted imaging mass spectrometry dataset into Cardinal and pre-process it in the following ways:
+
+1. Normalization to the total ion current (TIC)
+2. Peak picking
+3. Peak alginment
+4. Peak filtering
+
+In many instances, imaging mass spectrometry data acquired by TOF mass spectrometers will need additional pre-processing in the form of signal smoothing and baseline correction. We won't demo these with this lipid dataset, but their use is thoroughly explained in the [Cardinal documentation.](http://bioconductor.org/packages/release/bioc/vignettes/Cardinal/inst/doc/Cardinal-walkthrough.pdf)
+
+### Import required packages
+```{r import_packages, echo=T, message=F, warning=FALSE, results="hide"}
+require(Cardinal)
+```
+
+### Read imzML file into Cardinal
+```{r read_data}
+cer_dan <- readImzML('DAN_cerebellum_neg', folder = 'D:/code/testing_data/') # data file : D:/code/testing_data/DAN_cerebellum_neg.imzML
+
+```
+
+```{r ds_info_print, echo=F}
+cat('Dataset info:\n',
+    'm/z bins \n',
+    '\t',dim(cer_dan)[[1]],'\n',
+    'no. pixels \n' ,
+    '\t',dim(cer_dan)[[2]])
+```
+
+### TIC normalization
+```{r normalize_data, message=FALSE, warning=FALSE, results="hide"}
+cer_dan <- normalize(cer_dan, method = "tic")
+```
+
+### Initial peak picking
+```{r peak_pick_init, message=FALSE, warning=FALSE, results="hide"}
+cer_dan_pl <- peakPick(cer_dan, 
+                   pixel = seq(1, ncol(cer_dan), by = 10), #we peak pick on every 10th spectrum here
+                   method = "simple", #simple assumes constant noise accross mass axis
+                   SNR = 3) #SNR = signal to noise, 3 is standard but this will vary by dataset
+```
+
+### Peak alignment to mean
+```{r peak_align, message=FALSE, warning=FALSE, results="hide"}
+cer_dan_pl_aligned <-  peakAlign(cer_dan_pl, #unaligned peak list
+                         ref = cer_dan, #generate mean spec
+                         method = "diff", #search by difference
+                         units = "mz", #search by m/z
+                         diff.max = 0.35) #plus minus m/z tolerance
+
+```
+
+### Peak filtering
+```{r peak_filter, message=FALSE, warning=FALSE, results="hide"}
+cer_dan_pl_filtered <- peakFilter(cer_dan_pl_aligned, #aligned peaklist
+                                        method = "freq", # by peak frequency
+                                        freq.min = ncol(cer_dan_pl_aligned)*0.05) #peak must be in at least 5% of the spectra
+
+```
+
+```{r peak_info_print, echo=F}
+cat('retained peaks \n',
+    '\t',dim(cer_dan_pl_filtered)[[1]])
+```
+
+### Peak extraction from whole dataset
+```{r peak_extraction, eval=F, message=FALSE, warning=FALSE, results="hide"}
+##this process can be time consuming
+cer_dan_peaks <- reduceDimension(cer_dan, #normalized full profile dataset
+                                 ref = cer_dan_pl_filtered, #developed peak list
+                                 type = "height") #get peak heights (intensities)
+```
+
+*Now we have a peak picked dataset in the Cardinal container that we can use for data analysis.*
+We can save this dataset to disk and do other data analysis steps now.
+
+### Saving RData for later use
+```{r, eval = F}
+save(cer_dan_peaks, file="cer_dan_peaks.RData")
+```
+
+### Loading RData for later use
+```{r, eval = F}
+load("cer_dan_peaks.RData")
+```
