@@ -1,0 +1,62 @@
+---
+title: "AIMS.MSRC - exporting intensity matrix of IMS data"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+# Introduction
+Often times after processing data we would like to export the peak table to share with collaborators or use in other software or even use in other R packages. In this brief tutorial we show how to do this. We will use the ```exportIntensMatrix()``` function for this purpose. This function writes a comma-separated table to disk that can easily be loaded into Microsoft Excel or other spreadsheet program or other software of the intensity data for every pixel and mass bin of a Cardinal dataset.
+
+In this context, metadata are things like sample name, any ROIs selected through ```selectROI()```, and anything else in the ```pData(cardinaldata)```. 
+
+### Import required packages
+```{r import_packages, echo=T, message=F, warning=FALSE, results="hide"}
+require(Cardinal)
+require(aimsMSRC)
+```
+
+### Import included mouse brain cerebellum dataset
+```{r load_data}
+data(cer_dan_peaks)
+```
+
+### Exporting the peak table with all metadata over the full mass range
+```{r outmeta1}
+fullMZ_fullMeta <- exportIntensMatrix(cer_dan_peaks, 
+                                  mz_range = c(0,100000), #we give this a much larger range than our actual dataset 
+                                  metadata = TRUE, 
+                                  filename = "fullMZ_fullMeta") # this will be appended with .csv extension at write-time
+```
+
+### Exporting the peak table without metadata over the full mass range
+```{r outmeta2}
+fullMZ_noMeta <- exportIntensMatrix(cer_dan_peaks, 
+                                  mz_range = c(0,100000), #we give this a much larger range than our actual dataset 
+                                  metadata = FALSE,
+                                  filename = "fullMZ_noMeta")
+```
+
+### Exporting the peak table with all metadata over select mass range
+```{r outmeta3}
+mz725_750_fullMeta <- exportIntensMatrix(cer_dan_peaks, 
+                                  mz_range = c(700,750), #we only export a peak table with between m/z 700-750
+                                  metadata = TRUE, 
+                                  filename = "mz700_750_fullMeta")
+```
+
+We can get an idea of the structure of these R data.frames by looking at the first few columns and rows as shown below:
+
+```{r outmeta1_tbl}
+head(fullMZ_fullMeta, row.names=F)[,1:6] # the last indexing only prints the first 6 columns
+```
+
+```{r outmeta2_tbl}
+head(fullMZ_noMeta, row.names=F)[,1:6] # the last indexing only prints the first 6 columns
+```
+
+```{r outmeta3_tbl}
+head(mz725_750_fullMeta , row.names=F)[,1:6] # the last indexing only prints the first 6 columns
+```
+
+*Now the data we have processed and examined in R can be used in other softwares or other R packages.*

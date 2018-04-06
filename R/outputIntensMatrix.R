@@ -15,18 +15,18 @@ exportIntensMatrix <- function(cardinaldata, mz_range = c(0,1000), metadata = TR
   end_feature = features(cardinaldata, mz=max(mz_range))
 
   if(metadata == TRUE){
-    intensity_df = data.frame(pData(cardinaldata), t(iData(cardinaldata))[,begin_feature:end_feature])
+    intensity_df = data.frame(pData(cardinaldata), t(iData(cardinaldata))[,begin_feature:end_feature], row.names=NULL)
     colnames(intensity_df) <- c(colnames(pData(cardinaldata)),
                                 round(mz(cardinaldata)[begin_feature:end_feature],3))
 
     } else {
-    intensity_df = data.frame(pData(cardinaldata)[,1:2], t(iData(cardinaldata))[,begin_feature:end_feature])
-    colnames(intensity_df) <- c(colnames(pData(cardinaldata))[,1:2],
+    intensity_df = data.frame(pData(cardinaldata)[,1:2], t(iData(cardinaldata))[,begin_feature:end_feature], row.names=NULL)
+    colnames(intensity_df) <- c(colnames(pData(cardinaldata))[1:2],
                                 round(mz(cardinaldata)[begin_feature:end_feature],3))
 
   }
 
-  write.csv(intensity_df, file=paste0(filename, '.csv'))
-
+  write.csv(intensity_df, file=paste0(filename, '.csv'), row.names=F)
+  return(intensity_df)
 
 }

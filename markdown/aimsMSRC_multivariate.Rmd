@@ -1,0 +1,130 @@
+---
+title: "AIMS.MSRC - exploratory multivariate analysis"
+output:
+  html_document: default
+  html_notebook: default
+---
+
+# Introduction
+Mass spectral data is multivariate. This means we measure multiple signals (variables) in each mass spectrum. This makes the datasets very complex. Multivariate analysis in this tutorial aims to simplify and extract important signals from complex data.
+
+### Import required packages
+```{r import_packages, echo=T, message=F, warning=FALSE, results="hide"}
+require(Cardinal)
+require(aimsMSRC)
+set.seed(0) ## this will make the SSCG results reproducible (it uses random initilization)
+```
+
+### Import included mouse brain cerebellum dataset
+```{r load_data}
+data(cer_dan_peaks)
+```
+
+### Print dataset info
+```{r summarize_data}
+summary(cer_dan_peaks)
+```
+This dataset includes 707 peaks. We need to find ways to represent the inherit patterns in the data. An extremely robust manner of doing this is through [Principal Components Analysis (PCA)](https://en.wikipedia.org/wiki/Principal_component_analysis). PCA is a statistical procedure that uses an orthogonal transformation to convert a set of observations of possibly correlated variables into a set of values of linearly uncorrelated variables called principal components.
+
+### Performing PCA on the data
+```{r perform_pca}
+cer_dan_pca <- PCA(cer_dan_peaks, ncomp=100)
+```
+
+### Examining principal component scores as images
+```{r image_pca}
+image(cer_dan_pca, column=1, 
+      layout=c(3,1), key=F, colorkey=F, strip=F,
+      main= 'PC1')
+
+image(cer_dan_pca, column=2, 
+      key=F, colorkey=F, strip=F,
+      main = 'PC2')
+
+image(cer_dan_pca, column=3, 
+      key=F, colorkey=F, strip=F,
+      main = 'PC3')
+```
+Here we can visualize the major patterns inherit in the IMS data. Now we may wish to further learn what signals contribute to each principal component by looking at the loading plots.
+
+```{r plot_pca}
+plot(cer_dan_pca, column=1, 
+      layout=c(1,3), key=F, strip=F,
+      main= 'PC1', xlim=c(700,1000))
+
+plot(cer_dan_pca, column=2, 
+      key=F, strip=F,
+      main = 'PC2',xlim=c(700,1000))
+
+plot(cer_dan_pca, column=3, 
+      key=F, strip=F,
+      main = 'PC3',xlim=c(700,1000))
+```
+
+Now we may examine which signals contribute most to a given principal component individually. For PC1 we will extract the two 10 signals and plot a few.
+
+```{r top_pca}
+top_idx_PC1 = order(cer_dan_pca$loadings$`ncomp = 100`[,1], decreasing = F)
+top_idx_PC2 = order(cer_dan_pca$loadings$`ncomp = 100`[,2], decreasing = F)
+top_idx_PC3 = order(cer_dan_pca$loadings$`ncomp = 100`[,3], decreasing = F)
+
+image(cer_dan_peaks, mz = mz(cer_dan_peaks)[top_idx_PC1[1]], layout=c(3,1), main='Top signal - PC1')
+image(cer_dan_peaks, mz = mz(cer_dan_peaks)[top_idx_PC2[1]], main='Top signal - PC2')
+image(cer_dan_peaks, mz = mz(cer_dan_peaks)[top_idx_PC3[1]], main='Top signal - PC3')
+
+```
+Now that we have explored PCA as a factorization approach to learn about our data. We can look at clustering (referred to as 'Segmentation' in imaging) of the mass spectral patterns.
+
+### Spatial Shrunken Centroids of k-means
+```{r sscg_segmentation, message=F, warning=FALSE, results="hide"}
+cer_dan_sscg <- spatialShrunkenCentroids(cer_dan_peaks, r=1, #neighborhood analysis for spatial data
+                                         k=12, #number of segments
+                                         s=1) # shrinkage term for regularization of segments
+```
+We have asked the algorithm to group all of the data into 12 clusters based on spectral similarity with some 'spatially-aware' aspects where relations between closely spaced pixels are more heavily weighted in clustering.
+
+### Image the segmentation map
+```{r image_sscg}
+image(cer_dan_sscg)
+```
+
+We can see now that we decompose the inherit tissue structure quite nicely. In the next plot we will place each segment into it's own image.
+
+```{r sscg_plot}
+image(cer_dan_sscg, layout=c(2,2), column=7, main= paste0('segment_',7), strip= F, colorkey=F, key=F)
+
+image(cer_dan_sscg, column=8, main=paste0('segment_', 8), strip= F, colorkey=F, key=F)
+image(cer_dan_sscg, column=10, main=paste0('segment_',10), strip= F, colorkey=F, key=F)
+image(cer_dan_sscg, column=11, main=paste0('segment_',11), strip= F, colorkey=F, key=F)
+
+
+```
+The Spatial Shrunken Centroids algorithm fits the k-means clusters to determine the most important signals for each clustering, allowing us to easily determine important species for a given segment.
+
+### Import signals for segment 7
+```{r toplab7}
+topLabels(cer_dan_sscg, 
+          filter=list(classes = 7), #only look at top species of segment 7!
+          n=10) #top 10
+```
+
+```{r toplab7_images}
+image(cer_dan_peaks, mz=883.5224, layout=c(3,1))
+image(cer_dan_peaks, mz=885.5833)
+image(cer_dan_peaks, mz=818.6026)
+```
+
+### Import signals for segment 8
+```{r toplab8}
+topLabels(cer_dan_sscg, 
+          filter=list(classes = 8), #only look at top species of segment 7!
+          n=10) #top 10
+```
+
+```{r toplab8_images}
+image(cer_dan_peaks, mz=786.5434, layout=c(3,1))
+image(cer_dan_peaks, mz=774.5212)
+image(cer_dan_peaks, mz=715.5553)
+```
+
+*Within this tutorial we have shown strategies on how we can look at the inherit stucture of the data and then learn about the signals that determine that structure.*
