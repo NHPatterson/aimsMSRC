@@ -33,6 +33,8 @@ install_github('nhpatterson/aimsMSRC')
  
     * [Data reading and pre-processing to peaks](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.Rmd)
     * [Comparse two user selected ROIs using ROC analysis](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_ROI_comparison.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_ROI_comparison.Rmd)
+    * [Exploratory multivariate analysis, PCA and clustering](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_multivariate.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_multivariate.Rmd)
+    * [Export peak intensity tables into .csv](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_exporting_data.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_exporting_data.Rmd)
     * [Convert & export data for data-driven image fusion](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_fusion_example.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_fusion_example.Rmd)
 
 
