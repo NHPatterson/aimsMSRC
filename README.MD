@@ -24,6 +24,7 @@ biocLite("Cardinal")
 install.packages('devtools')
 
 ##install the aimsMSRC package
+require(devtools)
 install_github('nhpatterson/aimsMSRC')
 ```
 
