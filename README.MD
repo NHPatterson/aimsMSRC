@@ -10,7 +10,9 @@ Please download and install R followed by RStudio.
 
 2. [Download and install latest version of RStudio Desktop for your platform](https://www.rstudio.com/products/rstudio/download/)
 
+## *For MacOS users*:
 
+3. [Download and install Xquartz for the ```imager``` depenency](https://www.xquartz.org/index.html)
 
 ## Getting started for the first time
 *Open RStudio and run the following lines in the R Console to install the necessary packages:*
