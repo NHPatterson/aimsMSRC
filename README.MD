@@ -26,6 +26,7 @@ biocLite("Cardinal")
 install.packages('devtools')
 
 ##install the aimsMSRC package
+require(devtools)
 install_github('nhpatterson/aimsMSRC')
 ```
 
@@ -33,7 +34,7 @@ install_github('nhpatterson/aimsMSRC')
 
 * Examine the tutorials:
  
-    * [Data reading and pre-processing to peaks](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.Rmd)
+    * [Data reading and pre-processing to peaks, demo only, raw data not included due to size](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_data_prepro.Rmd)
     * [Comparse two user selected ROIs using ROC analysis](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_ROI_comparison.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_ROI_comparison.Rmd)
     * [Exploratory multivariate analysis, PCA and clustering](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_multivariate.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_multivariate.Rmd)
     * [Export peak intensity tables into .csv](https://htmlpreview.github.io/?https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_exporting_data.html),  [R Markdown](https://github.com/NHPatterson/aimsMSRC/blob/master/markdown/aimsMSRC_exporting_data.Rmd)
