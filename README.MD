@@ -28,6 +28,9 @@ install.packages('devtools')
 ##install the aimsMSRC package
 require(devtools)
 install_github('nhpatterson/aimsMSRC')
+
+#load package
+require(aimsMSRC)
 ```
 
 ## What's next?
