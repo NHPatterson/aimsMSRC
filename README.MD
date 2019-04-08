@@ -1,4 +1,4 @@
-# Mass Spectrometry Research Center AIMS.2018 R package
+# Mass Spectrometry Research Center AIMS.2019 R package
 
 This is the R package accompanying the AIMS R data analysis course, it will give uses a very brief introduction to the open-source Cardinal in R for basic data pre-processing and analysis tasks and includes some MSRC in-house developed functions for data analysis.
 
