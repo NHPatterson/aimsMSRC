@@ -19,8 +19,10 @@ Please download and install R followed by RStudio.
 
 ```r
 ##Cardinal must be installed before any other steps!!
-source("http://bioconductor.org/biocLite.R")
-biocLite("Cardinal")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("Cardinal")
 
 ##install R package devtools to install from github
 install.packages('devtools')
